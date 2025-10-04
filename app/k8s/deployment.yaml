@@ -1,0 +1,30 @@
+# app/k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab-app
+  labels: { app: lab-app }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: lab-app } }
+  template:
+    metadata:
+      labels: { app: lab-app }
+    spec:
+      securityContext:
+        runAsUser: 1001
+        runAsNonRoot: true
+        fsGroup: 1001
+      containers:
+      - name: lab-app
+        image: 513689972854.dkr.ecr.us-east-1.amazonaws.com/lab-app:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities: { drop: ["ALL"] }
+        resources:
+          requests: { cpu: "100m", memory: "128Mi" }
+          limits:   { cpu: "500m", memory: "256Mi" }
